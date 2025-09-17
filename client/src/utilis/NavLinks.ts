@@ -32,12 +32,15 @@ export const navLinks: NavObj[] = [
         path: '/roles'
     },
     {
-        name: 'Complaints',
-        path: '/complaints'
+        name: 'Apply',
+        path: '/apply'
     },
     {
-        name: 'Loan Write Off',
-        path: '/writeoff'
+        name: 'Active Loans',
+        path: '/loans'
     },
-   
+    {
+        name: 'Repayments',
+        path: '/repayments'
+    }
 ]

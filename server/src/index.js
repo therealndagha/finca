@@ -10,6 +10,10 @@ import groupRoutes from './routes/group-routes.js';
 import loanProductRoutes from './routes/loanProducts-routes.js';
 import loanApplicationRoutes from './routes/loanApplication-routes.js';
 import rolesRoutes from './routes/role-routes.js';
+import loanRoutes from './routes/loan-routes.js';
+import repaymentRouter from "./routes/repayment-routes.js";
+
+
 
 
 dotenv.config();
@@ -36,7 +40,9 @@ app.use('/api/customers',customerRoutes );
 app.use('/api/staff', staffRoutes);
 app.use('/api/group', groupRoutes);
 app.use('/api/loanproducts', loanProductRoutes);
-app.use('/api/loan-applications', loanApplicationRoutes);
+app.use('/api/loanapplications', loanApplicationRoutes);
 app.use('/api/role', rolesRoutes);
+app.use('/api/loans', loanRoutes);
+app.use("/api/repayments", repaymentRouter);
 
 app.listen(PORT, ()=>console.log(`server is listening on port: ${PORT}`));
