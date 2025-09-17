@@ -1,24 +1,99 @@
+import db from "../config/db.js"; 
 
-import db from '../config/db.js'
+// GET /api/group
+export async function getAllGroups(req, res) {
+  try {
+    const [rows] = await db.query("SELECT * FROM `group` ORDER BY group_id ASC");
+    res.json({ success: true, data: rows });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Error fetching groups" });
+  }
+}
 
-export async function getAllGroups(req, res){
-    try {
-        const [rows] = await db.query(`SELECT * FROM \`group\``);
-        if(rows.length === 0){
-            return res.status(200).json({
-                success:false,
-                message: 'no groups found please add some group'
-            })
-        }
-        return res.status(200).json({
-            success:true,
-            message:'here is a list of groups',
-            data: rows
-        })
-    } catch (error) {
-        return res.status(500).json({
-            success: false,
-            message: 'some error occured while trying to get groups'
-        })
+// GET /api/group/:id
+export async function getGroupById(req, res) {
+  try {
+    const [rows] = await db.query("SELECT * FROM `group` WHERE group_id = ?", [
+      req.params.id,
+    ]);
+    if (rows.length === 0) {
+      return res.status(404).json({ success: false, message: "Group not found" });
     }
+    res.json({ success: true, data: rows[0] });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Error fetching group" });
+  }
+}
+
+// POST /api/group
+export async function createGroup(req, res) {
+  const { group_name, group_type, phone_no, address, branch_id } = req.body;
+
+  if (!group_name || !group_type || !phone_no || !address || !branch_id) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Please provide all required fields" });
+  }
+
+  try {
+    const [result] = await db.query(
+      "INSERT INTO `group` (group_name, group_type, phone_no, address, branch_id) VALUES (?, ?, ?, ?, ?)",
+      [group_name, group_type, phone_no, address, branch_id]
+    );
+    const [rows] = await db.query("SELECT * FROM `group` WHERE group_id = ?", [
+      result.insertId,
+    ]);
+    res.status(201).json({ success: true, data: rows[0] });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Error creating group" });
+  }
+}
+
+// PUT /api/group/:id
+export async function updateGroup(req, res) {
+  const { group_name, group_type, phone_no, address, branch_id } = req.body;
+  const { id } = req.params;
+
+  try {
+    const [existing] = await db.query("SELECT * FROM `group` WHERE group_id = ?", [
+      id,
+    ]);
+    if (existing.length === 0) {
+      return res.status(404).json({ success: false, message: "Group not found" });
+    }
+
+    await db.query(
+      "UPDATE `group` SET group_name=?, group_type=?, phone_no=?, address=?, branch_id=? WHERE group_id=?",
+      [group_name, group_type, phone_no, address, branch_id, id]
+    );
+
+    const [rows] = await db.query("SELECT * FROM `group` WHERE group_id = ?", [
+      id,
+    ]);
+    res.json({ success: true, data: rows[0] });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Error updating group" });
+  }
+}
+
+// DELETE /api/group/:id
+export async function deleteGroup(req, res) {
+  try {
+    const [existing] = await db.query("SELECT * FROM `group` WHERE group_id = ?", [
+      req.params.id,
+    ]);
+    if (existing.length === 0) {
+      return res.status(404).json({ success: false, message: "Group not found" });
+    }
+
+    await db.query("DELETE FROM `group` WHERE group_id = ?", [req.params.id]);
+    res.json({ success: true, message: "Group deleted" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: "Error deleting group" });
+  }
 }
